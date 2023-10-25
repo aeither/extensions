@@ -1,5 +1,37 @@
 # Pipe Commands Changelog
 
+## [Pipe to text enhancement] - 2023-10-24
+
+- Fallback to clipboard when text selection fails (new error type)
+
+## [Added new pipe commands] - 2023-10-22
+
+- Improved placeholder UX to make it clear what different commands pull from
+
+## [Added new pipe commands] - 2023-10-17
+
+- Added new command to convert tab to newline
+
+## [Added new pipe commands] - 2023-09-07
+
+- Adding extract url from text (extract-urls-from-text)
+
+## [Added new pipe commands] - 2023-08-08
+
+- Adding comma conversion utils (comma-to-newline, newline-to-comma)
+
+## [Added new pipe command] - 2023-05-31
+
+- Add a pipe text command script to remove duplicate newlines.
+
+## [File/Tab input] - 2022-10-04
+
+### Added
+
+- Add support for file and tab input
+- New directive `@raycast.inputType` and `@raycast.outputType` to specify the input and output for `pipe` mode
+- `silent` mode now supports setting the `@raycast.argument1` type to `file` or `tab`
+
 ## [Added new pipe commands] - 2022-09-26
 
 - Added new pipe command: convert newline to spaces
@@ -7,6 +39,7 @@
 ## [Added new pipe commands] - 2022-09-19
 
 Adding two new pipe command scripts:
+
 - Reverse lines
 - Convert newlines to spaces
 

@@ -447,3 +447,46 @@ Defines the visual style of the Action.
 Use [Action.Style.Regular](#action.style) for displaying a regular actions.
 Use [Action.Style.Destructive](#action.style) when your action has something that user should be careful about.
 Use the confirmation [Alert](../feedback/alert.md) if the action is doing something that user cannot revert.
+
+### Action.PickDate.Type
+
+The types of date components the user can pick with an `Action.PickDate`.
+
+#### Enumeration members
+
+| Name     | Description                                                      |
+| -------- | ---------------------------------------------------------------- |
+| DateTime | Hour and second can be picked in addition to year, month and day |
+| Date     | Only year, month, and day can be picked                          |
+
+### Action.PickDate.isFullDay
+
+A method that determines if a given date represents a full day or a specific time.
+
+```tsx
+import { ActionPanel, List, Action } from "@raycast/api";
+
+export default function Command() {
+  return (
+    <List>
+      <List.Item
+        title="Todo"
+        actions={
+          <ActionPanel>
+            <Action.PickDate
+              title="Set Due Date…"
+              onChange={(date) => {
+                if (Action.PickDate.isFullDay(values.reminderDate)) {
+                  // the event is for a full day
+                } else {
+                  // the event is at a specific time
+                }
+              }}
+            />
+          </ActionPanel>
+        }
+      />
+    </List>
+  );
+}
+```

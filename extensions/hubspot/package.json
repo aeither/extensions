@@ -6,7 +6,9 @@
   "icon": "extension_icon.png",
   "author": "harisvsulaiman",
   "contributors": [
-    "pernielsentikaer"
+    "pernielsentikaer",
+    "6farer",
+    "patricklenz"
   ],
   "license": "MIT",
   "categories": [

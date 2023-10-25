@@ -1,10 +1,14 @@
 import { Action, ActionPanel, Icon, Image, List } from "@raycast/api";
-import { ActionsProps, Cast, CastDetailsProps } from "./types";
-import { useCastSearch, useFarcasterInstalled, linkify } from "./utils";
 import { useState } from "react";
 
+import { ActionsProps, Cast, CastDetailsProps } from "./types";
+import { useCastSearch, useFarcasterInstalled, linkify } from "./utils";
+import { useDebounce } from "./hooks/useDebounce";
+
 export default function Command() {
-  const [searchText, setSearchText] = useState<string>();
+  const [_searchText, setSearchText] = useState<string>();
+  const searchText = useDebounce(_searchText, 500);
+
   const { data, isLoading } = useCastSearch(searchText || "");
   const hasFarcaster: boolean = useFarcasterInstalled();
 
@@ -43,9 +47,11 @@ export default function Command() {
 function Actions({ cast, farcasterInstalled }: ActionsProps) {
   return (
     <ActionPanel>
-      {farcasterInstalled && (
-        <Action.OpenInBrowser title="Open in Farcaster" url={`farcaster://casts/${cast.merkleRoot}`} />
-      )}
+      {farcasterInstalled && <Action.Open title="Open in Warpcast (Desktop)" target={cast.uri} />}
+      <Action.OpenInBrowser
+        title="Open in Warpcast (Web)"
+        url={`https://warpcast.com/${cast.body.username}/${cast.merkleRoot.substring(0, 8)}`}
+      />
       <Action.OpenInBrowser
         title="Open in Searchcaster"
         url={`https://searchcaster.xyz/search?merkleRoot=${cast.merkleRoot}`}

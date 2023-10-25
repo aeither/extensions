@@ -1,10 +1,14 @@
 import { Action, ActionPanel, Image, List } from "@raycast/api";
-import { Profile, ProfileActionsProps } from "./types";
-import { useProfileSearch, useFarcasterInstalled, truncateAddress, linkify } from "./utils";
 import { useState } from "react";
 
+import { Profile, ProfileActionsProps } from "./types";
+import { useDebounce } from "./hooks/useDebounce";
+import { useProfileSearch, useFarcasterInstalled, truncateAddress, linkify } from "./utils";
+
 export default function Command() {
-  const [searchText, setSearchText] = useState<string>();
+  const [_searchText, setSearchText] = useState<string>();
+  const searchText = useDebounce(_searchText, 500);
+
   const { data, isLoading } = useProfileSearch(searchText || "");
   const hasFarcaster: boolean = useFarcasterInstalled();
 
@@ -56,8 +60,9 @@ function Actions({ profile, farcasterInstalled }: ProfileActionsProps) {
   return (
     <ActionPanel>
       {farcasterInstalled && (
-        <Action.OpenInBrowser title="Open in Farcaster" url={`farcaster://profiles/${profile.body.id}`} />
+        <Action.Open title="Open in Warpcast (Desktop)" target={`farcaster://profiles/${profile.body.id}`} />
       )}
+      <Action.OpenInBrowser title="Open in Warpcast (Web)" url={`https://warpcast.com/${profile.body.username}`} />
       <Action.OpenInBrowser title="Open in Searchcaster" url={`https://searchcaster.xyz/u/${profile.body.username}`} />
     </ActionPanel>
   );
@@ -66,7 +71,7 @@ function Actions({ profile, farcasterInstalled }: ProfileActionsProps) {
 function ProfileDetails({ profile }: { profile: Profile }) {
   // Find all links in bio and replace them with markdown links
   const bio = profile.body.bio;
-  const markdown = linkify(bio);
+  const markdown = linkify(bio || "");
 
   return (
     <List.Item.Detail

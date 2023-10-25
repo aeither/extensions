@@ -1,24 +1,20 @@
-import { homedir } from "os";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { parseFileSync } from "bplist-parser";
 
 import { Bookmark, OrionFavoriteItem, OrionFavoritesPlistResult } from "../types";
-import { unique } from "../utils";
-import { join } from "path";
+import { getFavoritesPath, unique } from "../utils";
 import { showToast, Toast } from "@raycast/api";
 
-const FAVORITES_PATH = join(homedir(), "/Library/Application Support/Orion/Defaults/favourites.plist");
-
-const useBookmarks = () => {
+const useBookmarks = (selectedProfileId: string) => {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [folders, setFolders] = useState<string[]>([]);
   const [isLoading, setLoading] = useState(true);
 
-  const fetchItems = useCallback(async () => {
+  useEffect(() => {
+    const bookmarksPath = getFavoritesPath(selectedProfileId);
     setLoading(true);
-
     try {
-      const bookmarksPlist = parseFileSync(FAVORITES_PATH) as OrionFavoritesPlistResult;
+      const bookmarksPlist = parseFileSync(bookmarksPath) as OrionFavoritesPlistResult;
       const items = Object.values(bookmarksPlist[0]);
       const folders = parseFolderNames(Object.values(bookmarksPlist[0]));
       const bookmarks = parseBookmarks(items, folders);
@@ -26,15 +22,11 @@ const useBookmarks = () => {
       setFolders(Array.from(folders.values()));
       setLoading(false);
     } catch (e) {
-      await showToast(Toast.Style.Failure, "Error loading bookmarks", "Be sure to run Orion at least once.");
+      showToast(Toast.Style.Failure, "Error loading bookmarks", "Be sure to run Orion at least once.");
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+  }, [selectedProfileId]);
 
   return { folders, bookmarks, isLoading };
 };
@@ -59,6 +51,8 @@ function parseBookmarks(items: OrionFavoriteItem[], folders: Map<string, string>
       const bookmark: Bookmark = {
         uuid: oBookmark.id,
         title: oBookmark.title,
+        // We've filtered out bookmarks without url by this point
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         url: oBookmark.url!,
         folders: folder ? [folder] : [],
         dateAdded: oBookmark.dateAdded,

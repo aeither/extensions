@@ -1,5 +1,7 @@
 # Fantastical Changelog
 
-## [Fixed image rendering in read me] - 2022-08-12
+## [Enhancement] - 2023-10-09
 
-## [Initial Version] - 2022-08-11
+- Will not prompt the user to Install Fantastical if it's not installed
+
+## [Initial Version] - 2022-08-01

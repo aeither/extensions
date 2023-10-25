@@ -1,6 +1,12 @@
 import { Action, ActionPanel, Image, List } from "@raycast/api";
 import { getFavicon, MutatePromise } from "@raycast/utils";
-import { CopyLinkActionSection, EditTabActionSection, OpenLinkActionSections, OpenSpaceAction } from "./actions";
+import {
+  CopyLinkActionSection,
+  EditTabActionSection,
+  OpenLinkActionSections,
+  OpenSpaceAction,
+  CreateQuickLinkActionSection,
+} from "./actions";
 import { HistoryEntry, Space, Suggestion, Tab } from "./types";
 import { getDomain, getLastVisitedAt, getSpaceTitle } from "./utils";
 
@@ -16,7 +22,7 @@ export function HistoryEntryListItem(props: { entry: HistoryEntry; searchText: s
       accessories={[getLastVisitedAt(props.entry)]}
       actions={
         <ActionPanel>
-          <OpenLinkActionSections url={props.entry.url} searchText={props.searchText} />
+          <OpenLinkActionSections tabOrUrl={props.entry.url} searchText={props.searchText} />
           <CopyLinkActionSection url={props.entry.url} title={props.entry.title} />
         </ActionPanel>
       }
@@ -51,7 +57,7 @@ export function SuggestionListItem(props: { suggestion: Suggestion; searchText: 
       title={props.suggestion.query}
       actions={
         <ActionPanel>
-          <OpenLinkActionSections url={props.suggestion.url} searchText={props.searchText} />
+          <OpenLinkActionSections tabOrUrl={props.suggestion.url} searchText={props.searchText} />
           <CopyLinkActionSection url={props.suggestion.url} />
         </ActionPanel>
       }
@@ -70,8 +76,9 @@ export function TabListItem(props: { tab: Tab; searchText: string; mutate: Mutat
       }}
       actions={
         <ActionPanel>
-          <OpenLinkActionSections url={props.tab.url} searchText={props.searchText} />
+          <OpenLinkActionSections tabOrUrl={props.tab} searchText={props.searchText} />
           <CopyLinkActionSection url={props.tab.url} title={props.tab.title} />
+          <CreateQuickLinkActionSection url={props.tab.url} title={props.tab.title} />
           <EditTabActionSection tab={props.tab} mutate={props.mutate} />
         </ActionPanel>
       }
