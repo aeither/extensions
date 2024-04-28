@@ -1,6 +1,15 @@
 import { ActionPanel, List, Action, popToRoot, closeMainWindow, Image, Icon } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { StatusResponse, getStatus, getDevices, tailscale, ErrorDetails, getErrorDetails, Device } from "./shared";
+import {
+  StatusResponse,
+  getStatus,
+  getDevices,
+  tailscale,
+  sortDevices,
+  ErrorDetails,
+  getErrorDetails,
+  Device,
+} from "./shared";
 
 function loadExitNodes(status: StatusResponse) {
   const devices = getDevices(status);
@@ -23,7 +32,7 @@ function setExitNode(host: string, allowLAN: boolean) {
   }
 }
 
-function ExitNodeList() {
+export default function ExitNodeList() {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [error, setError] = useState<ErrorDetails>();
   const [exitNodes, setExitNodes] = useState<Device[]>([]);
@@ -33,11 +42,12 @@ function ExitNodeList() {
         const status = getStatus();
         const _list = loadExitNodes(status);
         setExitNodes(_list);
+        sortDevices(_list);
         if (isExitNodeActive(_list)) {
           setIsActive(true);
         }
       } catch (error) {
-        setError(getErrorDetails(error, "Couldn't load exit nodes."));
+        setError(getErrorDetails(error, "Couldn’t load exit nodes."));
       }
     }
     fetch();
@@ -84,7 +94,7 @@ function ExitNodeList() {
               }
               accessories={[
                 {
-                  text: exitNode.exitnode ? `        Connected` : "",
+                  tag: exitNode.exitnode ? `Connected` : "",
                 },
               ]}
               actions={
@@ -102,8 +112,4 @@ function ExitNodeList() {
       )}
     </List>
   );
-}
-
-export default function Command() {
-  return <ExitNodeList />;
 }

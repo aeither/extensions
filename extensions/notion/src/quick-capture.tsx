@@ -11,14 +11,14 @@ import {
   AI,
   Icon,
 } from "@raycast/api";
-import { useForm } from "@raycast/utils";
+import { useForm, withAccessToken } from "@raycast/utils";
 import { parseHTML } from "linkedom";
 import fetch from "node-fetch";
 import { useState, useEffect } from "react";
 
-import { View } from "./components";
 import { useSearchPages } from "./hooks";
 import { appendToPage, createDatabasePage, getPageIcon } from "./utils/notion";
+import { notionService } from "./utils/notion/oauth";
 
 const getPageDetail = async (url: string) => {
   try {
@@ -46,7 +46,9 @@ function validateUrl(input: string) {
 function QuickCapture() {
   const [searchText, setSearchText] = useState<string>("");
 
-  const { data: searchPages, isLoading } = useSearchPages(searchText);
+  const { data, isLoading } = useSearchPages(searchText);
+
+  const searchPages = data?.pages;
 
   const { itemProps, handleSubmit, setValue } = useForm<{
     url: string;
@@ -175,10 +177,4 @@ ${result?.content}
   );
 }
 
-export default function Command() {
-  return (
-    <View>
-      <QuickCapture />
-    </View>
-  );
-}
+export default withAccessToken(notionService)(QuickCapture);

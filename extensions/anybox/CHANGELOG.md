@@ -1,5 +1,14 @@
 # Anybox Changelog
 
+## [New Feature] - 2024-04-19
+
+- Add options to show folders and tags next to URL in Search Links command.
+
+## [Bug Fixes] - 2023-12-01
+
+- Fix some issues reported by Raycast.
+- Update Raycast API version to the latest.
+
 ## [New Feature] - 2023-11-01
 
 - Option to show search resutls as icons.

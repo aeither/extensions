@@ -1,12 +1,13 @@
 import { Action, ActionPanel, Application, Clipboard, Detail, List, getFrontmostApplication } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { $, ProcessOutput } from "zx";
-import { commandNotFoundMd, noContentMd } from "./messages";
-import { EspansoMatch } from "./types";
+import { ProcessOutput } from "zx";
+import { commandNotFoundMd, noContentMd } from "./content/messages";
+import { NormalizedEspansoMatch } from "./lib/types";
+import { getEspansoConfig, getMatches, sortMatches } from "./lib/utils";
 
 export default function Command() {
   const [isLoading, setIsLoading] = useState(true);
-  const [items, setItems] = useState<EspansoMatch[]>([]);
+  const [items, setItems] = useState<NormalizedEspansoMatch[]>([]);
   const [error, setError] = useState<ProcessOutput | null>(null);
   const [application, setApplication] = useState<Application | undefined>(undefined);
 
@@ -19,24 +20,31 @@ export default function Command() {
   const pasteTitle = `Paste to ${application?.name}`;
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
-        const { stdout: result } = await $`espanso match list -j`;
-        let matches: EspansoMatch[] = JSON.parse(result);
-        matches = matches.sort((a, b) => a.triggers[0].localeCompare(b.triggers[0]));
-        setItems(matches);
+        const { packages: packageFilesDirectory, match: matchFilesDirectory } = await getEspansoConfig();
+
+        const packageMatches = getMatches(packageFilesDirectory, { packagePath: true });
+
+        const userMatches = getMatches(matchFilesDirectory);
+
+        const combinedMatches: NormalizedEspansoMatch[] = [...userMatches, ...packageMatches];
+
+        const sortedMatches = sortMatches(combinedMatches);
+
+        setItems(sortedMatches);
         setIsLoading(false);
       } catch (err) {
         setError(err instanceof ProcessOutput ? err : null);
         setIsLoading(false);
       }
-    }
+    };
 
     fetchData();
   }, []);
 
   if (error) {
-    const notFound = Boolean(error.stderr.match("command not found"));
+    const notFound = Boolean(/command not found/.exec(error.stderr));
 
     return notFound ? <Detail markdown={commandNotFoundMd} /> : <Detail markdown={error.stderr} />;
   }
@@ -47,10 +55,11 @@ export default function Command() {
 
   return (
     <List isShowingDetail isLoading={isLoading}>
-      {items.map(({ triggers, replace }, index) => (
+      {items.map(({ triggers, replace, label }, index) => (
         <List.Item
           key={index}
-          title={triggers.join(", ")}
+          title={label ?? triggers.join(", ")}
+          subtitle={!label ? "" : triggers.join(", ")}
           detail={<List.Item.Detail markdown={replace} />}
           actions={
             <ActionPanel>
